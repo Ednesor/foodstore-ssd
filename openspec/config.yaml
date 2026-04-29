@@ -1,20 +1,74 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+# =============================================================================
+# Project Context — Food Store E-commerce
+# Este contexto se muestra al AI al crear artefactos
+# =============================================================================
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+context: |
+  ## Tech Stack
+  Backend: FastAPI · SQLModel · PostgreSQL · Alembic · bcrypt · python-jose · slowapi · MercadoPago SDK
+  Frontend: React 18 · TypeScript 5 · Vite 5 · TanStack Query 5 · TanStack Form · Zustand 4 · Axios · Tailwind CSS 3 · Recharts
+
+  ## Arquitectura Backend — Feature-First
+  Cada módulo funcional es una carpeta autocontenida con: model.py, schemas.py, repository.py, service.py, router.py
+  Flujo de dependencias: Router → Service → UoW → Repository → Model
+  Unit of Work: contexto asíncrono (async with) que gestiona transacciones atómicas
+  BaseRepository[T]: genérico con get_by_id, list_all, count, create, update, soft_delete, hard_delete
+
+  ## Arquitectura Frontend — Feature-Sliced Design (FSD)
+  Capas (de mayor a menor abstracción): app → pages → widgets → features → entities → shared
+  Imports: solo de capas superiores a inferiores (nunca reverse)
+  Estado del cliente: Zustand (carrito, auth, UI)
+  Estado del servidor: TanStack Query (productos, pedidos, usuarios)
+  Separación estricta: nunca mezclar Zustand con datos del servidor
+
+  ## convenciones de nombrado
+  Backend (Python): snake_case para archivos y variables, PascalCase para clases
+  Frontend (TypeScript): camelCase para variables y funciones, PascalCase para componentes
+  Changes: kebab-case (ej: project-scaffolding, backend-core-setup)
+
+  ## Dominio — Food Store
+  E-commerce de productos alimenticios
+  5 actores: Cliente, Admin, Gestor de Stock, Gestor de Pedidos, Sistema
+  4 roles RBAC: ADMIN, STOCK, PEDIDOS, CLIENT
+  Pedidos con FSM de 6 estados: PENDIENTE → CONFIRMADO → EN_PREPARACIÓN → EN_CAMINO → ENTREGADO (terminal)
+  Pagos vía MercadoPago Checkout API con webhooks IPN
+
+  ## Documentación del sistema
+  docs/Descripcion.txt: visión general, actores, stack
+  docs/Integrador.txt: arquitectura, ERD v5, API REST, patrones
+  docs/Historias_de_usuario.txt: US-000 a US-076
+  docs/CHANGES-ROADMAP.md: roadmap completo de 22 changes
+
+# =============================================================================
+# Per-Artifact Rules — Reglas específicas para cada artefacto
+# =============================================================================
+
+rules:
+  proposal:
+    - Incluir siempre la sección "Capabilities" con las nuevas capabilities
+    - Cada capability listada en el proposal debe tener su spec en specs/<name>/spec.md
+    - No incluir implementación en el proposal, eso va en design.md
+
+  design:
+    - Incluir siempre la sección "Decisions" con rationale de cada decisión
+    - Incluir siempre "Risks / Trade-offs" aunque sea mínimo
+    - Si hay alternativas consideradas, documentarlas
+
+  specs:
+    - Usar SHALL/MUST para requisitos normativos (evitar should/may)
+    - Cada requisito debe tener al menos un Scenario con formato WHEN/THEN
+    - Escenarios deben usar exactamente 4 hashtags (####) para headers
+    - Para requisitos MODIFIED: copiar el bloque completo del spec existente antes de modificar
+
+  tasks:
+    - Agrupar tareas bajo headers ## numerados
+    - Usar formato checkbox: - [ ] X.Y Descripción
+    - Tasks deben ser completables en una sesión (2-4 horas max)
+    - Ordenar por dependencias: lo que no tiene dependencias primero
+
+  verify:
+    - Siempre generar verify-report.md antes de archivar
+    - CRITICAL issues bloquean el archive; WARNING y SUGGESTION no
+    - Si no hay tests, verificar manualmente contra specs
