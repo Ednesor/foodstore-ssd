@@ -30,6 +30,6 @@
 
 ## 6. Git commit
 
-- [ ] 6.1 Stage all new files and directories
-- [ ] 6.2 Create commit with message following conventional commits format: `feat: add project scaffolding structure`
-- [ ] 6.3 Verify `git log` shows the commit with correct format
+- [x] 6.1 Stage all new files and directories
+- [x] 6.2 Create commit with message following conventional commits format: `feat: add project scaffolding structure`
+- [x] 6.3 Verify `git log` shows the commit with correct format
